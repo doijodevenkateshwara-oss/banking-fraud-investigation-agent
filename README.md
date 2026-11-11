@@ -17,6 +17,7 @@ and every step is recorded in an append-only, hash-chained audit trail.
 - [Demo users](#demo-users)
 - [Build, test and verify](#build-test-and-verify)
 - [Demonstration](#demonstration)
+- [User guide](docs/user-guide.md) — page-by-page screens and the end-to-end case lifecycle
 - [API](#api)
 - [Architecture](#architecture)
 - [Repository layout](#repository-layout)
