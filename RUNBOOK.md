@@ -76,6 +76,36 @@ CAPSTONE_DB_URL='jdbc:h2:mem:demo;DB_CLOSE_DELAY=-1' java -jar target/fraud-disp
 CAPSTONE_FIXED_CLOCK=2026-11-06T03:15:00Z java -jar target/fraud-dispute-agent.jar
 ```
 
+### Live run with Anthropic (example used 2026-11-11)
+
+1. Create `.env` in the repo root (gitignored — never commit it):
+
+   ```bash
+   ANTHROPIC_API_KEY=sk-ant-...
+   CAPSTONE_DEMO_PASSWORD=demo-pass
+   ```
+
+2. Start the app on port 8090 with a throwaway in-memory DB:
+
+   ```bash
+   set -a; . ./.env; set +a
+   CAPSTONE_DB_URL='jdbc:h2:mem:live;DB_CLOSE_DELAY=-1' \
+     java -jar target/fraud-dispute-agent.jar --server.port=8090
+   ```
+
+3. Verify health — `modelProvider` must be `UP` (it is `DEGRADED` without a key):
+
+   ```bash
+   curl -s localhost:8090/actuator/health | python3 -m json.tool
+   ```
+
+4. Open http://localhost:8090 and sign in as `investigator01` / `demo-pass`, then
+   **Cases → Load guide sample → Start investigation** for a live Claude investigation.
+
+Notes: the in-memory DB means all cases are lost on restart — omit `CAPSTONE_DB_URL` to use the
+persistent `./data` file DB instead. Live model output is not deterministic; `humanReviewRequired`
+is always `true` regardless.
+
 - Default DB is a file-based H2 database under `./data/`. Delete `./data` after schema or enum changes.
 - If port 8080 is busy, add `--server.port=8090`.
 - If `CAPSTONE_DEMO_PASSWORD` is unset, a random password is generated and printed once at start-up.
