@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Audit trail')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Audit trail</h1>
+        <p class="subtitle">Append-only, hash-chained events. Payloads are stored only as SHA-256 hashes.</p>
+        <div class="alert" th:if="${verification != null}" th:classappend="${verification.intact} ? 'alert-info' : 'alert-error'" role="status"
+             th:text="${verification.intact} ? ('Hash chain intact across ' + verification.events + ' events.') : ('Hash chain BROKEN at ' + verification.firstBrokenEventId)"></div>
+        <div class="card">
+            <table><caption class="sr-only">Audit events</caption>
+                <thead><tr><th scope="col">#</th><th scope="col">Event</th><th scope="col">Actor</th><th scope="col">Recorded (UTC)</th><th scope="col">Summary</th><th scope="col">Payload hash</th></tr></thead>
+                <tbody><tr th:each="e : ${events}">
+                    <td th:text="${e.sequence}"></td><td><strong th:text="${e.eventType}"></strong><br><span class="mono" th:text="${e.correlationId}"></span></td>
+                    <td th:text="${e.actorType + ' ' + e.actorId}"></td><td th:text="${e.recordedAt}"></td>
+                    <td th:text="${e.summary}"></td><td class="mono" th:text="${#strings.substring(e.payloadHash, 0, 16) + '…'}"></td></tr></tbody></table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Create fraud case')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Create fraud case</h1>
+        <p class="subtitle">Capture only the facts needed to begin a controlled investigation.</p>
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="alert alert-info" role="status" th:if="${draftLoaded and info == null}">A saved draft for this session was loaded.</div>
+        <div class="alert alert-error" role="alert" th:unless="${#maps.isEmpty(errors)}">
+            Please correct the highlighted fields (<span th:text="${#maps.size(errors)}">1</span>).</div>
+        <form class="card" method="post" th:action="@{/cases}" th:object="${form}" data-busy novalidate>
+            <div class="actions mt-0"><h2>Case details</h2><span class="chip chip-ok">SYNTHETIC DATA</span></div>
+            <div class="grid grid-3">
+                <div th:classappend="${errors.containsKey('maskedCustomerRef')} ? 'has-error'">
+                    <label for="maskedCustomerRef" class="req">Masked customer reference</label>
+                    <input type="text" id="maskedCustomerRef" th:field="*{maskedCustomerRef}" placeholder="CUST-••••-4821" aria-describedby="err-maskedCustomerRef" required>
+                    <p class="field-error" id="err-maskedCustomerRef" th:if="${errors.containsKey('maskedCustomerRef')}" th:text="${errors.maskedCustomerRef}"></p></div>
+                <div th:classappend="${errors.containsKey('transactionRef')} ? 'has-error'">
+                    <label for="transactionRef" class="req">Transaction reference</label>
+                    <input type="text" id="transactionRef" th:field="*{transactionRef}" placeholder="TXN-2026-784102" aria-describedby="err-transactionRef" required>
+                    <p class="field-error" id="err-transactionRef" th:if="${errors.containsKey('transactionRef')}" th:text="${errors.transactionRef}"></p></div>
+                <div th:classappend="${errors.containsKey('paymentChannel')} ? 'has-error'">
+                    <label for="paymentChannel" class="req">Payment channel</label>
+                    <select id="paymentChannel" th:field="*{paymentChannel}">
+                        <option th:each="v : ${T(com.bfs.fraudcase.domain.PaymentChannel).values()}" th:value="${v}" th:text="${v}"></option></select>
+                    <p class="field-error" th:if="${errors.containsKey('paymentChannel')}" th:text="${errors.paymentChannel}"></p></div>
+                <div th:classappend="${errors.containsKey('amount') or errors.containsKey('currency')} ? 'has-error'">
+                    <label for="amount" class="req">Amount</label>
+                    <input type="text" id="amount" th:field="*{amount}" inputmode="decimal" placeholder="48750.00" aria-describedby="err-amount" required>
+                    <p class="field-error" id="err-amount" th:if="${errors.containsKey('amount')}" th:text="${errors.amount}"></p></div>
+                <div th:classappend="${errors.containsKey('currency')} ? 'has-error'">
+                    <label for="currency" class="req">Currency (ISO 4217)</label>
+                    <input type="text" id="currency" th:field="*{currency}" maxlength="3" aria-describedby="err-currency" required>
+                    <p class="field-error" id="err-currency" th:if="${errors.containsKey('currency')}" th:text="${errors.currency}"></p></div>
+                <div th:classappend="${errors.containsKey('transactionStatus')} ? 'has-error'">
+                    <label for="transactionStatus" class="req">Transaction status</label>
+                    <select id="transactionStatus" th:field="*{transactionStatus}">
+                        <option th:each="v : ${T(com.bfs.fraudcase.domain.TransactionStatus).values()}" th:value="${v}" th:text="${v}"></option></select></div>
+                <div th:classappend="${errors.containsKey('occurredAt')} ? 'has-error'">
+                    <label for="occurredAt" class="req">Transaction timestamp</label>
+                    <input type="datetime-local" id="occurredAt" th:field="*{occurredAt}" aria-describedby="err-occurredAt" required>
+                    <p class="field-error" id="err-occurredAt" th:if="${errors.containsKey('occurredAt')}" th:text="${errors.occurredAt}"></p></div>
+                <div>
+                    <label for="utcOffset">Time zone offset</label>
+                    <select id="utcOffset" th:field="*{utcOffset}">
+                        <option value="+05:30">+05:30 (IST)</option><option value="Z">UTC</option><option value="+01:00">+01:00</option>
+                        <option value="-05:00">-05:00</option></select></div>
+                <div>
+                    <label for="reportedChannel">Reported via</label>
+                    <select id="reportedChannel" th:field="*{reportedChannel}">
+                        <option th:each="v : ${T(com.bfs.fraudcase.domain.ReportedChannel).values()}" th:value="${v}" th:text="${v}"></option></select></div>
+            </div>
+            <div class="grid grid-2 mt-16">
+                <div th:classappend="${errors.containsKey('maskedMerchant')} ? 'has-error'">
+                    <label for="maskedMerchant" class="req">Masked merchant</label>
+                    <input type="text" id="maskedMerchant" th:field="*{maskedMerchant}" placeholder="NORTHSTAR DIGITAL ••••73" aria-describedby="err-maskedMerchant" required>
+                    <p class="field-error" id="err-maskedMerchant" th:if="${errors.containsKey('maskedMerchant')}" th:text="${errors.maskedMerchant}"></p></div>
+                <div th:classappend="${errors.containsKey('customerLocation')} ? 'has-error'">
+                    <label for="customerLocation">Customer location</label>
+                    <input type="text" id="customerLocation" th:field="*{customerLocation}" placeholder="Bengaluru, Karnataka">
+                    <p class="field-error" th:if="${errors.containsKey('customerLocation')}" th:text="${errors.customerLocation}"></p></div>
+                <div th:classappend="${errors.containsKey('issueType')} ? 'has-error'">
+                    <label for="issueType" class="req">Issue type</label>
+                    <select id="issueType" th:field="*{issueType}">
+                        <option th:each="v : ${T(com.bfs.fraudcase.domain.IssueType).values()}" th:value="${v}" th:text="${v}"></option></select></div>
+                <div>
+                    <label for="cardPossession" class="req">Card possession</label>
+                    <select id="cardPossession" th:field="*{cardPossession}">
+                        <option th:each="v : ${T(com.bfs.fraudcase.domain.CardPossession).values()}" th:value="${v}" th:text="${v}"></option></select></div>
+            </div>
+            <div class="mt-16" th:classappend="${errors.containsKey('customerStatement')} ? 'has-error'">
+                <label for="customerStatement" class="req">Customer statement</label>
+                <textarea id="customerStatement" th:field="*{customerStatement}" maxlength="1000" aria-describedby="hint-statement err-customerStatement" required></textarea>
+                <p class="advisory" id="hint-statement">Max 1000 characters. No card, account or other long numbers; markup is rejected. Stored as an unverified customer claim.</p>
+                <p class="field-error" id="err-customerStatement" th:if="${errors.containsKey('customerStatement')}" th:text="${errors.customerStatement}"></p></div>
+            <div class="checklist mt-8">
+                <label><input type="checkbox" th:field="*{merchantRecognised}"> Customer recognises the merchant</label>
+                <label th:classappend="${errors.containsKey('syntheticDataConfirmed')} ? 'has-error'"><input type="checkbox" th:field="*{syntheticDataConfirmed}"> <span class="req">I confirm this case uses synthetic training data only</span></label>
+                <p class="field-error" th:if="${errors.containsKey('syntheticDataConfirmed')}" th:text="${errors.syntheticDataConfirmed}"></p>
+                <label><input type="checkbox" th:field="*{reviewRequired}"> <span class="req">Human review is required (mandatory)</span></label>
+                <p class="field-error" th:if="${errors.containsKey('reviewRequired')}" th:text="${errors.reviewRequired}"></p>
+            </div>
+            <p class="mt-12"><span class="advisory">Issue indicators: </span>
+                <span th:each="chip : ${form.indicators()}" class="chip" th:classappend="${chip.value}" th:text="${chip.key}"></span>
+                <span class="empty" th:if="${#maps.isEmpty(form.indicators())}">none yet</span></p>
+            <div class="actions">
+                <button type="submit" class="btn" name="action" value="draft" formnovalidate>Save draft</button>
+                <span>
+                    <button type="submit" class="btn" name="action" value="create" data-busy-label="Creating…">Create case</button>
+                    <button type="submit" class="btn btn-primary" name="action" value="start" th:if="${isInvestigator}" data-busy-label="Investigating…">Start investigation</button>
+                </span>
+            </div>
+            <p id="busy-status" class="sr-only" aria-live="polite"></p>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

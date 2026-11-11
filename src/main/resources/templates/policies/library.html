@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Policy library')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <section class="content">
+        <h1>Approved policy pack</h1>
+        <p class="subtitle">Synthetic training policies ingested at start-up. Withdrawn versions are visibly unavailable and never retrieved.</p>
+        <div class="card">
+            <table><thead><tr><th scope="col">Document</th><th scope="col">Version</th><th scope="col">Effective</th><th scope="col">Section</th><th scope="col">Chunk</th><th scope="col">Status</th></tr></thead>
+                <tbody><tr th:each="p : ${chunks}">
+                    <td th:text="${p.documentId + ' — ' + p.title}"></td><td th:text="${p.version}"></td><td th:text="${p.effectiveDate}"></td>
+                    <td th:text="${p.section + ' ' + p.sectionTitle}"></td>
+                    <td><a class="mono" th:href="@{/policies/{id}(id=${p.chunkId})}" th:text="${p.chunkId}"></a></td>
+                    <td><span class="chip" th:classappend="${p.active} ? 'chip-ok' : 'chip-danger'" th:text="${p.active} ? 'ACTIVE' : (${p.status} + ' – unavailable')"></span></td></tr></tbody></table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

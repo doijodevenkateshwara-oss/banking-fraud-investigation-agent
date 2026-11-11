@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Policy citations')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Policy citations</h1>
+        <p class="subtitle">Show the exact approved passages used to support procedural guidance.</p>
+        <div class="card" th:if="${rec == null}"><p class="empty">Policy has not been retrieved for this case yet.</p></div>
+        <div class="card" th:if="${rec != null}">
+            <div class="passage flex-row">
+                <span class="advisory">Query</span><span class="flex-1" th:text="${rec.policyQuery}">query</span>
+                <span class="chip chip-info" th:text="${'Top-K ' + rec.retrievalTopK}">Top-K 4</span>
+                <span class="chip chip-ok" th:text="${'min ' + rec.retrievalThreshold}">min 0.72</span></div>
+            <article class="passage" tabindex="-1" th:each="p : ${citations}" th:id="${'cite-' + p.chunkId}"
+                     th:classappend="${!p.available} ? 'unavailable'">
+                <span class="score" th:text="${#numbers.formatDecimal(p.score, 1, 2)}">0.89</span>
+                <strong th:text="${p.title}">CNP Dispute Handling Procedure</strong>
+                <p class="meta" th:text="${p.documentId + ' · v' + p.version + ' · effective ' + #temporals.format(p.effectiveDate, 'dd MMM yyyy')}"></p>
+                <p class="meta" th:text="${'Section ' + p.section + ' · ' + p.sectionTitle + ' · chunk ' + p.chunkId}"></p>
+                <p th:text="${p.passage}">passage</p>
+                <p class="actions mt-4">
+                    <span><span class="chip chip-ok" th:if="${p.cited}">Cited in recommendation</span>
+                        <span class="chip chip-info" th:unless="${p.cited}">Retrieved, not cited</span>
+                        <span class="chip chip-danger" th:unless="${p.available}">Unavailable: withdrawn or superseded</span></span>
+                    <a th:href="@{/policies/{chunk}(chunk=${p.chunkId})}" th:if="${p.available}">Open passage</a></p>
+            </article>
+            <div class="alert alert-warn" role="status" th:if="${rec.abstained}">
+                <strong>Abstention.</strong> No approved passage met the similarity threshold. The assistant makes no policy claim;
+                human interpretation is required.</div>
+            <p class="alert alert-warn" th:unless="${rec.abstained}">If no passage meets the threshold, the assistant must abstain and request human interpretation.</p>
+            <div th:unless="${#lists.isEmpty(withdrawn)}">
+                <h2>Withdrawn versions excluded from retrieval</h2>
+                <ul><li th:each="w : ${withdrawn}" class="advisory"
+                        th:text="${w.documentId + ' v' + w.version + ' §' + w.section + ' (' + w.status + ', effective ' + w.effectiveDate + ') — not citable'}"></li></ul></div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

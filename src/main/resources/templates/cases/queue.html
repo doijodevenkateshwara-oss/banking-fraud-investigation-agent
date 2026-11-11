@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Review queue')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <section class="content">
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="actions mt-0">
+            <div><h1>Review queue</h1><p class="subtitle">Cases awaiting an authorised reviewer disposition (READY_FOR_REVIEW, UNDER_REVIEW, INCOMPLETE).</p></div>
+            
+                
+        </div>
+        <div class="card">
+            <p class="empty" th:if="${#lists.isEmpty(cases)}">No cases are waiting for review.</p>
+            <table th:unless="${#lists.isEmpty(cases)}">
+                <caption class="sr-only">Fraud cases</caption>
+                <thead><tr><th scope="col">Case</th><th scope="col">Status</th><th scope="col">Transaction</th><th scope="col">Issue</th>
+                    <th scope="col">Recommendation</th><th scope="col">Priority</th><th scope="col">Reported</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${cases}">
+                    <td><a th:href="@{/cases/{id}/review(id=${s.caseId})}" th:text="${s.caseId}">CASE</a></td>
+                    <td><span class="status-badge" th:classappend="'st-' + ${s.status}" th:text="${s.status}"></span></td>
+                    <td><span th:text="${s.transactionRef}"></span><br><span class="advisory" th:text="${s.currency + ' ' + s.amount + ' · ' + s.maskedMerchant}"></span></td>
+                    <td th:text="${s.issueType}"></td>
+                    <td><span th:if="${s.classification != null}" th:text="${s.classification + ' → ' + s.recommendedRoute}"></span>
+                        <span th:if="${s.riskLevel != null}" class="chip" th:classappend="'risk-' + ${s.riskLevel}" th:text="${s.riskLevel + ' risk'}"></span>
+                        <span class="empty" th:if="${s.classification == null}">Not investigated</span></td>
+                    <td th:text="${s.priority ?: '—'}"></td>
+                    <td><span th:text="${#temporals.format(s.reportedAt, 'dd MMM yyyy HH:mm')}"></span> UTC</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

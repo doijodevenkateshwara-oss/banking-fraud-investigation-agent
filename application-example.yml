@@ -1,0 +1,23 @@
+# Example configuration with placeholders only (guide section 5.3). Real values come from environment variables.
+capstone:
+  human-review-required: true    # start-up fails if false
+  allow-financial-actions: false # start-up fails if true
+  allow-customer-contact: false  # start-up fails if true
+  fixed-clock: ""                # e.g. 2026-11-06T03:15:00Z for reproducible demos
+  retrieval:
+    top-k: 4
+    similarity-threshold: 0.72
+  memory:
+    max-messages: 12
+  tools:
+    timeout-ms: 2500
+    deterministic-seed: fraud-training-v1
+  model:                         # LangChain4j + Anthropic (only provider); no key -> safe manual review
+    model-name: claude-sonnet-4-5
+    api-key: ${ANTHROPIC_API_KEY:}
+    timeout-seconds: 60
+    temperature: 0.0
+    max-tokens: 2048
+    max-tool-invocations: 12
+  security:
+    demo-password: ${CAPSTONE_DEMO_PASSWORD:}

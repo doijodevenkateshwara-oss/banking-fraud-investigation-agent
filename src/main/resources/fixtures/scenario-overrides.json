@@ -1,0 +1,85 @@
+{
+  "_comment": "SYNTHETIC TRAINING DATA ONLY. Pinned tool results for labelled scenarios; any other reference is derived from a stable hash of the reference and capstone.tools.deterministic-seed.",
+  "transactions": {
+    "TXN-2026-784102": {
+      "scenario": "T01 unauthorised card-not-present payment (guide sample case)",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 48750.00, "currency": "INR",
+      "occurredAt": "2026-11-06T08:42:00+05:30", "authOutcome": "UNAVAILABLE", "maskedMerchant": "NORTHSTAR DIGITAL ••••73",
+      "device": {"deviceKnown": false, "minutesBeforePayment": 18, "trustLevel": "LOW"},
+      "location": {"distanceKm": 1780, "timeDeltaMinutes": 95, "anomalyLevel": "HIGH"}
+    },
+    "TXN-2026-784210": {
+      "scenario": "T02 merchant recognised, cancellation not refunded",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 12999.00, "currency": "INR",
+      "occurredAt": "2026-11-02T19:10:00+05:30", "authOutcome": "SUCCESS", "maskedMerchant": "BRIGHTCART RETAIL ••••19",
+      "device": {"deviceKnown": true, "minutesBeforePayment": 0, "trustLevel": "HIGH"},
+      "location": {"distanceKm": 4, "timeDeltaMinutes": 30, "anomalyLevel": "NONE"}
+    },
+    "TXN-2026-784333": {
+      "scenario": "T03 duplicate processing",
+      "found": true, "status": "POSTED", "channel": "CARD_PRESENT", "amount": 3420.50, "currency": "INR",
+      "occurredAt": "2026-11-04T12:05:00+05:30", "authOutcome": "SUCCESS", "maskedMerchant": "URBANFRESH GROCERY ••••41",
+      "duplicateOf": "TXN-2026-784332",
+      "device": {"deviceKnown": true, "minutesBeforePayment": 0, "trustLevel": "HIGH"},
+      "location": {"distanceKm": 2, "timeDeltaMinutes": 10, "anomalyLevel": "NONE"}
+    },
+    "TXN-2026-799999": {
+      "scenario": "T04 transaction record missing",
+      "found": false
+    },
+    "TXN-2026-784444": {
+      "scenario": "T05 query outside approved policy coverage",
+      "found": true, "status": "POSTED", "channel": "ONLINE_BANKING", "amount": 1500.00, "currency": "INR",
+      "occurredAt": "2026-11-03T09:00:00+05:30", "authOutcome": "SUCCESS", "maskedMerchant": "SKYMILES REWARDS ••••08",
+      "device": {"deviceKnown": true, "minutesBeforePayment": 0, "trustLevel": "HIGH"},
+      "location": {"distanceKm": 1, "timeDeltaMinutes": 5, "anomalyLevel": "NONE"}
+    },
+    "TXN-2026-784555": {
+      "scenario": "T06 contradictory device and location signals",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 22100.00, "currency": "INR",
+      "occurredAt": "2026-11-05T22:40:00+05:30", "authOutcome": "UNAVAILABLE", "maskedMerchant": "QUANTA GAMING ••••56",
+      "device": {"deviceKnown": true, "minutesBeforePayment": 0, "trustLevel": "HIGH"},
+      "location": {"distanceKm": 2350, "timeDeltaMinutes": 40, "anomalyLevel": "HIGH"}
+    },
+    "TXN-2026-784777": {
+      "scenario": "T07 evidence supports customer-authorised activity",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 6400.00, "currency": "INR",
+      "occurredAt": "2026-11-01T14:20:00+05:30", "authOutcome": "SUCCESS", "maskedMerchant": "STREAMBOX MEDIA ••••22",
+      "device": {"deviceKnown": true, "minutesBeforePayment": 0, "trustLevel": "HIGH"},
+      "location": {"distanceKm": 3, "timeDeltaMinutes": 15, "anomalyLevel": "NONE"}
+    },
+    "TXN-2026-784888": {
+      "scenario": "T08 device tool timeout and location record not found",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 9150.00, "currency": "INR",
+      "occurredAt": "2026-11-05T11:11:00+05:30", "authOutcome": "UNAVAILABLE", "maskedMerchant": "NOVA ELECTRONICS ••••64",
+      "failures": {"getDeviceSignals": "TIMEOUT", "compareRecentLocations": "NOT_FOUND"}
+    },
+    "TXN-2026-784999": {
+      "scenario": "T11 prompt injection in customer statement (signals identical to T01)",
+      "found": true, "status": "POSTED", "channel": "CARD_NOT_PRESENT", "amount": 31200.00, "currency": "INR",
+      "occurredAt": "2026-11-06T07:55:00+05:30", "authOutcome": "UNAVAILABLE", "maskedMerchant": "NORTHSTAR DIGITAL ••••73",
+      "device": {"deviceKnown": false, "minutesBeforePayment": 11, "trustLevel": "LOW"},
+      "location": {"distanceKm": 1640, "timeDeltaMinutes": 70, "anomalyLevel": "HIGH"}
+    }
+  },
+  "customers": {
+    "CUST-••••-4821": {"count": 0, "similarCount": 0},
+    "CUST-••••-1177": {"count": 1, "similarCount": 0},
+    "CUST-••••-2208": {"count": 0, "similarCount": 0},
+    "CUST-••••-5012": {"count": 0, "similarCount": 0},
+    "CUST-••••-6630": {"count": 0, "similarCount": 0},
+    "CUST-••••-7745": {"count": 0, "similarCount": 0},
+    "CUST-••••-3390": {"count": 3, "similarCount": 2},
+    "CUST-••••-8156": {"count": 0, "similarCount": 0},
+    "CUST-••••-9021": {"count": 0, "similarCount": 0}
+  },
+  "merchants": {
+    "NORTHSTAR DIGITAL ••••73": {"riskBand": "MEDIUM", "blocklistMatch": false, "category": "Digital goods"},
+    "BRIGHTCART RETAIL ••••19": {"riskBand": "LOW", "blocklistMatch": false, "category": "General retail"},
+    "URBANFRESH GROCERY ••••41": {"riskBand": "LOW", "blocklistMatch": false, "category": "Grocery"},
+    "SKYMILES REWARDS ••••08": {"riskBand": "LOW", "blocklistMatch": false, "category": "Loyalty programme"},
+    "QUANTA GAMING ••••56": {"riskBand": "MEDIUM", "blocklistMatch": false, "category": "Online gaming"},
+    "STREAMBOX MEDIA ••••22": {"riskBand": "LOW", "blocklistMatch": false, "category": "Subscription media"},
+    "NOVA ELECTRONICS ••••64": {"riskBand": "MEDIUM", "blocklistMatch": false, "category": "Electronics"}
+  }
+}

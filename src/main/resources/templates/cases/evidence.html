@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Evidence workspace')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Evidence workspace</h1>
+        <p class="subtitle">Separate observed facts from customer claims and generated summaries.</p>
+        <div class="card">
+            <div class="actions mt-0"><h2>Observed evidence (tool results)</h2>
+                <span class="chip chip-ok" th:text="${#lists.size(observed) + ' VERIFIED ITEMS'}">5 VERIFIED ITEMS</span></div>
+            <p class="empty" th:if="${#lists.isEmpty(observed)}">No tool evidence recorded yet.</p>
+            <div class="grid grid-2">
+                <article class="evidence-card" th:each="e : ${observed}" th:id="${e.evidenceId}">
+                    <div class="row"><span class="chip chip-info" th:text="${e.type}">DEVICE</span>
+                        <span class="chip" th:classappend="'sev-' + ${e.severity}" th:text="${e.severity}">HIGH</span></div>
+                    <strong th:text="${e.title}">New device observed</strong>
+                    <span th:text="${e.valueSummary}">value</span>
+                    <span class="provenance"><span class="mono" th:text="${e.evidenceId}"></span> · <span th:text="${e.source}"></span> ·
+                        <span th:text="${#temporals.format(e.observedAt, 'HH:mm:ss')}"></span> UTC ·
+                        <a th:href="@{/cases/{id}/evidence/{ev}(id=${c.caseId},ev=${e.evidenceId})}">Open redacted record</a></span>
+                </article>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Customer claims (validated intake, unverified)</h2>
+            <div class="grid grid-2">
+                <article class="evidence-card" th:each="e : ${claims}" th:id="${e.evidenceId}">
+                    <div class="row"><span class="chip chip-info" th:text="${e.type}">CUSTOMER</span>
+                        <span class="chip" th:classappend="'sev-' + ${e.severity}" th:text="${e.severity}">CLAIMED</span></div>
+                    <strong th:text="${e.title}">Customer statement</strong>
+                    <span th:text="${e.valueSummary}"></span>
+                    <span class="provenance"><span class="mono" th:text="${e.evidenceId}"></span> · <span th:text="${e.source}"></span> ·
+                        <span th:text="${#temporals.format(e.observedAt, 'HH:mm:ss')}"></span> UTC ·
+                        <a th:href="@{/cases/{id}/evidence/{ev}(id=${c.caseId},ev=${e.evidenceId})}">Open intake record</a></span>
+                </article>
+            </div>
+        </div>
+        <div class="card" th:if="${rec != null}">
+            <h2>Generated summary <span class="chip chip-warn" th:text="${rec.mode == T(com.bfs.fraudcase.domain.RecommendationMode).LANGCHAIN4J} ? 'MODEL-GENERATED' : 'MANUAL-REVIEW'">GENERATED</span></h2>
+            <p th:text="${rec.rationale}"></p>
+            <p class="advisory">Generated text is advisory; rely on the observed evidence above.</p>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

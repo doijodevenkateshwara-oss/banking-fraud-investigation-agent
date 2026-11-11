@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Policy passage')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <section class="content">
+        <div class="card">
+            <h1 th:text="${chunk.title}">Title</h1>
+            <div class="alert alert-error" role="alert" th:unless="${chunk.active}">This version is <span th:text="${chunk.status}"></span> and must not be cited.</div>
+            <dl class="kv">
+                <dt>Document ID</dt><dd th:text="${chunk.documentId}"></dd><dt>Version</dt><dd th:text="${chunk.version}"></dd>
+                <dt>Effective date</dt><dd th:text="${chunk.effectiveDate}"></dd><dt>Owner</dt><dd th:text="${chunk.owner}"></dd>
+                <dt>Classification</dt><dd th:text="${chunk.classification}"></dd><dt>Section</dt><dd th:text="${chunk.section + ' ' + chunk.sectionTitle}"></dd>
+                <dt>Chunk ID</dt><dd class="mono" th:text="${chunk.chunkId}"></dd></dl>
+            <p class="mt-16" th:text="${chunk.text}">text</p>
+            <a class="btn" href="/policies">Policy library</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

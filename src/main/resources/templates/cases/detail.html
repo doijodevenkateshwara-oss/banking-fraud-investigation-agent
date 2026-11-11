@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head(${c.caseId})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Case intake record</h1>
+        <p class="subtitle">Validated, masked intake. The customer statement is a claim, not verified evidence.</p>
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="alert alert-warn" role="status" th:if="${c.injectionSuspected}">
+            The customer statement contains instruction-like text. It is treated strictly as data and cannot change tools, routing or review.</div>
+        <div class="card">
+            <div class="actions mt-0"><h2 th:text="${c.caseId}">CASE</h2>
+                <span><span class="status-badge" th:classappend="'st-' + ${c.status}" th:text="${c.status}"></span>
+                <span class="chip chip-ok">SYNTHETIC DATA</span></span></div>
+            <dl class="kv">
+                <dt>Masked customer reference</dt><dd th:text="${c.maskedCustomerRef}"></dd>
+                <dt>Transaction reference</dt><dd th:text="${c.transactionRef}"></dd>
+                <dt>Amount</dt><dd th:text="${c.currency + ' ' + #numbers.formatDecimal(c.amount, 1, 'COMMA', 2, 'POINT')}"></dd>
+                <dt>Transaction timestamp</dt><dd th:text="${c.occurredAt}"></dd>
+                <dt>Status / channel</dt><dd th:text="${c.transactionStatus + ' · ' + c.paymentChannel}"></dd>
+                <dt>Masked merchant</dt><dd th:text="${c.maskedMerchant}"></dd>
+                <dt>Customer location</dt><dd th:text="${c.customerLocation ?: '—'}"></dd>
+                <dt>Issue type</dt><dd th:text="${c.issueType}"></dd>
+                <dt>Card possession</dt><dd th:text="${c.cardPossession}"></dd>
+                <dt>Merchant recognised</dt><dd th:text="${c.merchantRecognised} ? 'Yes' : 'No'"></dd>
+                <dt>Customer statement (claim)</dt><dd th:text="${c.customerStatement}"></dd>
+                <dt>Reported</dt><dd th:text="${c.reportedAt + ' via ' + c.reportedChannel + ' by ' + c.analystId}"></dd>
+                <dt>Allowed next states</dt><dd th:text="${c.allowedNextStates}"></dd>
+            </dl>
+            <form method="post" th:action="@{/cases/{id}/investigations(id=${c.caseId})}" th:if="${isInvestigator and (c.status.name() == 'NEW' or c.status.name() == 'INCOMPLETE')}" data-busy class="actions">
+                <button type="submit" class="btn btn-primary" data-busy-label="Investigating…"
+                        th:text="${c.status.name() == 'NEW'} ? 'Start investigation' : 'Restart investigation'">Start investigation</button>
+            </form>
+            <p id="busy-status" class="sr-only" aria-live="polite"></p>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

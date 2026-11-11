@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Evidence record')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1 th:text="${'Evidence ' + record.evidence.evidenceId}">Evidence</h1>
+        <p class="subtitle">Underlying redacted record with provenance.</p>
+        <div class="card">
+            <dl class="kv">
+                <dt>Type / severity</dt><dd th:text="${record.evidence.type + ' · ' + record.evidence.severity}"></dd>
+                <dt>Finding</dt><dd th:text="${record.evidence.title + ': ' + record.evidence.valueSummary}"></dd>
+                <dt>Provenance</dt><dd th:text="${record.evidence.provenance + ' · ' + record.evidence.source}"></dd>
+                <dt>Observed at</dt><dd th:text="${record.evidence.observedAt}"></dd>
+                <dt>Tool trace</dt><dd class="mono" th:text="${record.evidence.toolTraceId ?: 'n/a (validated intake)'}"></dd>
+                <dt th:if="${record['toolTrace'] != null}">Request hash</dt><dd class="mono" th:if="${record['toolTrace'] != null}" th:text="${record['toolTrace'].requestHash}"></dd>
+            </dl>
+            <h2 class="mt-16" th:text="${record['toolTrace'] != null} ? 'Redacted tool result' : 'Validated intake record'">Record</h2>
+            <pre th:text="${rawJson}">{}</pre>
+            <a class="btn" th:href="@{/cases/{id}/evidence(id=${c.caseId})}">Back to evidence</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

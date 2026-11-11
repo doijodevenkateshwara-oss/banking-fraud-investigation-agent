@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Agent investigation')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Agent investigation</h1>
+        <p class="subtitle">Visible operational trace: plan, tool calls, results and unresolved questions.</p>
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="alert alert-warn" role="status" th:if="${rec != null and rec.fallbackReason != null}">
+            Safe manual review applied (<span th:text="${rec.mode}"></span>): <span th:text="${rec.fallbackReason}"></span></div>
+
+        <div class="card" th:if="${inv.runNumber == 0}">
+            <p class="empty">No investigation has run yet.</p>
+            <form method="post" th:action="@{/cases/{id}/investigations(id=${c.caseId})}" th:if="${isInvestigator}" data-busy>
+                <button type="submit" class="btn btn-primary mt-8" data-busy-label="Investigating…">Start investigation</button>
+            </form>
+        </div>
+
+        <div class="grid grid-2" th:if="${inv.runNumber > 0}">
+            <div class="card">
+                <h2>Investigation plan</h2>
+                <p class="advisory" th:text="${'Goal: ' + inv.goal}"></p>
+                <ol class="plan">
+                    <li th:each="s : ${inv.plan}" th:class="${s.status}">
+                        <span class="dot" aria-hidden="true" th:text="${s.order}">1</span>
+                        <span class="label" th:text="${s.label}">step</span>
+                        <span class="chip" th:classappend="${s.status == 'COMPLETE'} ? 'chip-ok' : (${s.status == 'FAILED'} ? 'chip-danger' : 'chip-warn')"
+                              th:text="${#strings.capitalize(#strings.toLowerCase(s.status))}">Complete</span>
+                    </li>
+                </ol>
+                <div class="alert alert-warn mt-16" th:each="u : ${inv.unresolved}">
+                    <strong>Unresolved question</strong><br><span th:text="${u}"></span></div>
+                <p class="empty" th:if="${#lists.isEmpty(inv.unresolved)}">No unresolved questions.</p>
+            </div>
+            <div class="card">
+                <div class="actions mt-0"><h2>Tool execution</h2>
+                    <span class="chip chip-info" th:text="${c.caseId + ' · run ' + inv.runNumber + ' · ' + inv.mode}"></span></div>
+                <div class="tool-card" th:each="t : ${inv.traces}">
+                    <span class="name" th:text="${t.toolName}">tool</span>
+                    <span class="chip" th:classappend="'ts-' + ${t.status}" th:text="${t.status}">SUCCEEDED</span>
+                    <span class="summary" th:text="${t.resultSummary}">summary</span>
+                    <span class="meta"><span th:text="${t.durationMs + ' ms'}"></span><br><span class="mono" th:text="${t.traceId}"></span></span>
+                </div>
+                <p class="empty" th:if="${#lists.isEmpty(inv.traces)}">No tool calls recorded.</p>
+                <p class="banner-dark">Operational trace only · no hidden reasoning</p>
+                <p class="advisory">Correlation ID: <span class="mono" th:text="${inv.correlationId}"></span></p>
+            </div>
+        </div>
+
+        <div class="card" th:if="${inv.runNumber > 0 and isInvestigator and (c.status.name() == 'INCOMPLETE')}">
+            <form method="post" th:action="@{/cases/{id}/investigations(id=${c.caseId})}" data-busy>
+                <p>Required evidence was missing or unavailable. You may restart the bounded analysis.</p>
+                <button type="submit" class="btn btn-primary mt-8" data-busy-label="Investigating…">Restart investigation</button>
+            </form>
+        </div>
+
+        <div class="card" id="follow-up" th:if="${inv.runNumber > 0}">
+            <h2>Case-scoped follow-up</h2>
+            <p class="advisory">Answers use only this case's stored record and conversation. They cannot change the recommendation.</p>
+            <div class="alert alert-info" role="status" th:if="${followUp != null}">
+                <strong>Q:</strong> <span th:text="${followUp.question}"></span><br>
+                <strong>A (<span th:text="${followUp.mode}"></span>):</strong> <span th:text="${followUp.answer}"></span></div>
+            <form method="post" th:action="@{/cases/{id}/messages(id=${c.caseId})}" th:if="${isInvestigator or isReviewer}" data-busy>
+                <label for="question">Question</label>
+                <input type="text" id="question" name="question" maxlength="500" required placeholder="Which evidence is missing?">
+                <button type="submit" class="btn mt-8" data-busy-label="Asking…">Ask</button>
+            </form>
+        </div>
+        <p class="actions" th:if="${rec != null}"><span></span><a class="btn btn-primary" th:href="@{/cases/{id}/recommendation(id=${c.caseId})}">Open recommendation</a></p>
+        <p id="busy-status" class="sr-only" aria-live="polite"></p>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

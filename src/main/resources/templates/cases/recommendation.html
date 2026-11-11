@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Agent recommendation')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Agent recommendation</h1>
+        <p class="subtitle">Advisory output only. A reviewer must accept, revise or reject it.</p>
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="card" th:if="${rec == null}"><p class="empty">No validated recommendation is available yet. Run the investigation first.</p></div>
+        <div class="card" th:if="${rec != null}">
+            <div class="alert alert-warn" role="status" th:if="${rec.fallbackReason != null}">
+                Produced by <strong th:text="${rec.mode}"></strong> after: <span th:text="${rec.fallbackReason}"></span>.
+                The rejected model output was not persisted.</div>
+            <div class="risk-banner" th:classappend="${rec.riskLevel.name() == 'LOW'} ? 'lowrisk' : (${rec.riskLevel.name() == 'MEDIUM'} ? 'medrisk' : '')">
+                <div><span class="chip" th:classappend="'risk-' + ${rec.riskLevel}" th:text="${rec.riskLevel + ' RISK'}">HIGH RISK</span>
+                    <p class="mt-8 fw-600" th:text="${rec.classification}">UNAUTHORISED_TRANSACTION</p></div>
+                <div><span class="advisory">Recommended route</span>
+                    <p class="my-4 fw-600" th:text="${rec.recommendedRoute}">FRAUD_INVESTIGATION</p>
+                    <span class="advisory" th:text="${'Priority ' + rec.priority}"></span></div>
+                <div><span class="chip chip-info" th:text="${#numbers.formatInteger(rec.confidence * 100, 1) + '% confidence'}">86% confidence</span>
+                    <p class="advisory" th:text="${'Mode: ' + rec.mode + ' · run ' + rec.runNumber}"></p></div>
+            </div>
+            <div class="grid grid-2 mt-16">
+                <div class="card m-0">
+                    <h2>Grounded rationale</h2>
+                    <p th:text="${rec.rationale}">rationale</p>
+                    <p class="advisory">Linked evidence:
+                        <a th:each="e : ${rec.evidenceIds}" th:href="@{/cases/{id}/evidence/{ev}(id=${c.caseId},ev=${e})}" th:text="${e}" class="mono mr-6"></a></p>
+                    <p class="advisory">Policy citations:
+                        <a class="mr-6" th:each="p : ${rec.policyCitations}" th:href="@{/cases/{id}/citations(id=${c.caseId})} + '#cite-' + ${p.chunkId}"
+                           th:text="${p.documentId + ' v' + p.version + ' §' + p.section}"></a>
+                        <span class="empty" th:if="${#lists.isEmpty(rec.policyCitations)}">none (retrieval abstained; no procedural claim made)</span></p>
+                </div>
+                <div class="card m-0">
+                    <h2>Decision checks</h2>
+                    <dl class="checks">
+                        <dt>Evidence items linked</dt><dd><span class="chip chip-ok" th:text="${#lists.size(rec.evidenceIds)}">5</span></dd>
+                        <dt>Policy citations linked</dt><dd><span class="chip" th:classappend="${rec.abstained} ? 'chip-warn' : 'chip-ok'" th:text="${#lists.size(rec.policyCitations)}">2</span></dd>
+                        <dt>Missing information</dt><dd><span class="chip" th:classappend="${#lists.isEmpty(rec.missingInformation)} ? 'chip-ok' : 'chip-warn'" th:text="${#lists.size(rec.missingInformation)}">1</span></dd>
+                        <dt>Contradictions</dt><dd><span class="chip" th:classappend="${#lists.isEmpty(rec.contradictions)} ? 'chip-ok' : 'chip-warn'" th:text="${#lists.size(rec.contradictions)}">0</span></dd>
+                        <dt>Tool calls traced</dt><dd><span class="chip chip-info" th:text="${#lists.size(rec.toolTraceIds)}">7</span></dd>
+                        <dt>Schema validation</dt><dd><span class="chip chip-ok" th:text="${rec.schemaValidation}">PASS</span></dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="alert alert-warn mt-16" th:unless="${#lists.isEmpty(rec.missingInformation)}">
+                <strong>Missing information</strong>
+                <ul class="my-6"><li th:each="m : ${rec.missingInformation}" th:text="${m}"></li></ul>
+                The recommendation may proceed to review, but the reviewer should request or record these items before final disposition.</div>
+            <div class="alert alert-warn" th:unless="${#lists.isEmpty(rec.contradictions)}">
+                <strong>Contradictions</strong><ul class="my-6"><li th:each="m : ${rec.contradictions}" th:text="${m}"></li></ul></div>
+            <div class="card" th:unless="${#lists.isEmpty(rec.evidenceRequests)}">
+                <h2>Recommended evidence requests</h2>
+                <p class="advisory">Suggestions for the reviewer. The assistant does not contact anyone.</p>
+                <ul><li th:each="m : ${rec.evidenceRequests}" th:text="${m}"></li></ul></div>
+            <div class="actions">
+                <span class="chip chip-info mono">humanReviewRequired = <span th:text="${rec.humanReviewRequired}">true</span></span>
+                <form method="post" th:action="@{/cases/{id}/review/start(id=${c.caseId})}" th:if="${isReviewer and (c.status.name() == 'READY_FOR_REVIEW' or c.status.name() == 'UNDER_REVIEW')}">
+                    <button type="submit" class="btn btn-primary">Open human review</button></form>
+                <a class="btn" th:href="@{/cases/{id}/review(id=${c.caseId})}" th:unless="${isReviewer and (c.status.name() == 'READY_FOR_REVIEW' or c.status.name() == 'UNDER_REVIEW')}">View review status</a>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

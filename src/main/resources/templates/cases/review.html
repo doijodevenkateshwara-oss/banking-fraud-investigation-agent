@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Human review')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <aside th:replace="~{fragments/layout :: stepper}"></aside>
+    <section class="content">
+        <h1>Human review</h1>
+        <p class="subtitle">The reviewer owns the final disposition and must record a reason.</p>
+        <div th:replace="~{fragments/layout :: flash}"></div>
+        <div class="card" th:unless="${#lists.isEmpty(reviews)}">
+            <h2>Recorded dispositions</h2>
+            <table><thead><tr><th scope="col">Review</th><th scope="col">Reviewer</th><th scope="col">Disposition</th><th scope="col">Final route</th><th scope="col">Reason</th><th scope="col">Recorded</th></tr></thead>
+                <tbody><tr th:each="r : ${reviews}"><td class="mono" th:text="${r.reviewId}"></td><td th:text="${r.reviewerId}"></td>
+                    <td th:text="${r.disposition}"></td><td th:text="${r.finalRoute ?: '—'}"></td><td th:text="${r.reason}"></td>
+                    <td th:text="${r.recordedAt}"></td></tr></tbody></table>
+        </div>
+        <div class="card" th:if="${rec == null}"><p class="empty">There is no validated recommendation to review yet.</p></div>
+        <div class="card" th:if="${rec != null and !isReviewer}"><p class="empty">Only authorised reviewers can record a disposition. Current status: <span th:text="${c.status}"></span>.</p></div>
+        <form method="post" th:action="@{/cases/{id}/review(id=${c.caseId})}" th:object="${form}"
+              th:if="${rec != null and isReviewer and (c.status.name() == 'READY_FOR_REVIEW' or c.status.name() == 'UNDER_REVIEW' or c.status.name() == 'INCOMPLETE' or c.status.name() == 'ROUTED')}"
+              class="grid grid-2" novalidate>
+            <div class="card m-0">
+                <h2>Reviewer decision</h2>
+                <div class="risk-banner"><span class="chip chip-danger">AGENT RECOMMENDATION</span>
+                    <span th:text="${rec.classification + ' → ' + rec.recommendedRoute + ' (' + rec.riskLevel + ', ' + rec.priority + ')'}"></span></div>
+                <div class="alert alert-warn mt-12" th:if="${c.status.name() == 'INCOMPLETE' or c.status.name() == 'ROUTED'}">
+                    In state <span th:text="${c.status}"></span> the only permitted disposition is CLOSE_NO_ACTION.</div>
+                <fieldset class="fieldset-plain mt-16" th:classappend="${errors.containsKey('disposition')} ? 'has-error'">
+                    <legend class="legend-sm">Select final disposition <span class="req"></span></legend>
+                    <div class="radio-option" th:each="d : ${decisions}">
+                        <input type="radio" th:id="${'d-' + d}" th:field="*{disposition}" th:value="${d}">
+                        <label th:for="${'d-' + d}" th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(d, '_', ' ')))}">Escalate</label></div>
+                    <p class="field-error" th:if="${errors.containsKey('disposition')}" th:text="${errors.disposition}"></p>
+                </fieldset>
+                <div th:if="${isLead}" th:classappend="${errors.containsKey('overrideRoute')} ? 'has-error'">
+                    <label for="overrideRoute">Override route (team lead, OVERRIDE only)</label>
+                    <select id="overrideRoute" th:field="*{overrideRoute}"><option value="">—</option>
+                        <option th:each="r : ${routes}" th:value="${r}" th:text="${r}"></option></select>
+                    <p class="field-error" th:if="${errors.containsKey('overrideRoute')}" th:text="${errors.overrideRoute}"></p></div>
+                <div class="mt-12" th:classappend="${errors.containsKey('reason')} ? 'has-error'">
+                    <label for="reason" class="req">Reviewer rationale</label>
+                    <textarea id="reason" th:field="*{reason}" maxlength="1000" aria-describedby="err-reason" required></textarea>
+                    <p class="field-error" id="err-reason" role="alert" th:if="${errors.containsKey('reason')}" th:text="${errors.reason}"></p></div>
+            </div>
+            <div class="card m-0">
+                <h2>Review checklist</h2>
+                <div class="checklist" th:classappend="${errors.containsKey('checklist')} ? 'has-error'">
+                    <label th:each="item : ${checklistItems}"><input type="checkbox" th:field="*{checklist}" th:value="${item}">
+                        <span th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(item, '_', ' ')))}">item</span></label>
+                    <p class="field-error" role="alert" th:if="${errors.containsKey('checklist')}" th:text="${errors.checklist}"></p>
+                </div>
+                <div class="alert alert-warn" th:unless="${#lists.isEmpty(rec.missingInformation)}">
+                    <strong>Missing information to acknowledge:</strong>
+                    <ul class="my-4"><li th:each="m : ${rec.missingInformation}" th:text="${m}"></li></ul></div>
+                <div class="passage"><span class="advisory">Audit event preview</span>
+                    <p class="my-6 fw-600">REVIEW_DISPOSITION_RECORDED</p>
+                    <span class="advisory" th:text="${currentUser + ' · timestamped · append-only · payload hashed'}"></span></div>
+                <div class="actions">
+                    <a class="btn" th:href="@{/cases/{id}/recommendation(id=${c.caseId})}">Return to case</a>
+                    <button type="submit" class="btn btn-primary">Submit final disposition</button></div>
+            </div>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

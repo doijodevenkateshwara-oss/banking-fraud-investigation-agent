@@ -1,0 +1,26 @@
+package com.bfs.fraudcase.domain;
+
+/**
+ * Append-only audit event types.
+ *
+ * @author Venkateshwara Doijode
+ */
+public enum AuditEventType {
+    CASE_CREATED,
+    STATE_CHANGED,
+    INVESTIGATION_STARTED,
+    PLAN_CREATED,
+    TOOL_EXECUTED,
+    POLICY_RETRIEVED,
+    POLICY_ABSTAINED,
+    MODEL_INVOKED,
+    MODEL_UNAVAILABLE,
+    RECOMMENDATION_REJECTED,
+    RECOMMENDATION_RECORDED,
+    FALLBACK_APPLIED,
+    FOLLOW_UP_ASKED,
+    REVIEW_STARTED,
+    REVIEW_DISPOSITION_RECORDED,
+    ACCESS_DENIED,
+    PROMPT_INJECTION_SUSPECTED
+}

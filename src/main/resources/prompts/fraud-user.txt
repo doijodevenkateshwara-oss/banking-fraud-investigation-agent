@@ -1,0 +1,27 @@
+INVESTIGATION GOAL
+{{investigationGoal}}
+
+BOUNDED PLAN (use only these approved tools)
+{{plan}}
+
+CASE SUMMARY (validated, masked intake)
+<case_facts>
+{{caseSummary}}
+</case_facts>
+
+INTAKE EVIDENCE (customer claims; unverified)
+{{intakeEvidence}}
+
+CUSTOMER STATEMENT
+<untrusted_data>
+{{customerStatement}}
+</untrusted_data>
+
+SUGGESTED POLICY QUERY TERMS
+{{policyQueryHint}}
+
+GUARDRAILS
+{{guardrails}}
+
+OUTPUT SCHEMA (JSON Schema; return exactly one conforming object, caseId must be "{{caseId}}")
+{{outputSchema}}

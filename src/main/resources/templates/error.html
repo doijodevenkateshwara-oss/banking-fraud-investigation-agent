@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="shell">
+    <section class="content">
+        <div class="card" role="alert">
+            <h1 th:text="${title ?: 'Something went wrong'}">Error</h1>
+            <p th:text="${message ?: 'The request could not be completed safely.'}">Message</p>
+            <p class="advisory">Status <span th:text="${status}">500</span>
+                <span th:if="${correlationId != null}"> · reference <span class="mono" th:text="${correlationId}"></span></span></p>
+            <a class="btn" href="/cases">Back to cases</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:fraudtest;DB_CLOSE_DELAY=-1
+capstone:
+  fixed-clock: 2026-11-06T03:15:00Z
+  tools:
+    timeout-ms: 300
+  model:
+    api-key: ""
+  security:
+    demo-password: test-only-password
+logging:
+  level:
+    root: WARN

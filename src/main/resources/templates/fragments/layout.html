@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · FraudOps AI (synthetic training)'">FraudOps AI</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/app.js" defer></script>
+</head>
+<body>
+
+<header th:fragment="header" class="topbar">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="brand"><span class="brand-name">FRAUDOPS</span> <span class="brand-ai">AI</span>
+        <span class="synthetic-flag" title="All data in this application is synthetic">SYNTHETIC TRAINING DATA</span></div>
+    <nav aria-label="Primary">
+        <ul class="nav">
+            <li><a href="/cases" th:classappend="${nav == 'cases'} ? 'active'" th:attr="aria-current=${nav == 'cases'} ? 'page' : null">Cases</a></li>
+            <li><a th:href="${c != null} ? @{/cases/{id}/investigation(id=${c.caseId})} : @{/cases}"
+                   th:classappend="${nav == 'investigation'} ? 'active'" th:attr="aria-current=${nav == 'investigation'} ? 'page' : null">Investigation</a></li>
+            <li><a th:href="${c != null} ? @{/cases/{id}/citations(id=${c.caseId})} : @{/policies}"
+                   th:classappend="${nav == 'policies'} ? 'active'" th:attr="aria-current=${nav == 'policies'} ? 'page' : null">Policies</a></li>
+            <li><a href="/review-queue" th:classappend="${nav == 'queue'} ? 'active'" th:attr="aria-current=${nav == 'queue'} ? 'page' : null">Review queue</a></li>
+        </ul>
+    </nav>
+    <div class="user" th:if="${currentUser != null}">
+        <span class="user-chip" th:text="${currentUser}" th:title="${#strings.listJoin(currentRoles, ', ')}">reviewer08</span>
+        <form th:action="@{/logout}" method="post" class="inline"><button type="submit" class="link-button">Sign out</button></form>
+    </div>
+</header>
+
+<aside th:fragment="stepper" class="stepper" aria-label="Case workflow">
+    <p class="stepper-title">CASE WORKFLOW</p>
+    <p class="stepper-case" th:if="${c != null}">
+        <span th:text="${c.caseId}">CASE</span>
+        <span class="status-badge" th:classappend="'st-' + ${c.status}" th:text="${c.status}">NEW</span>
+    </p>
+    <ol>
+        <li th:classappend="${step == 1} ? 'current'">
+            <a th:href="${c != null} ? @{/cases/{id}(id=${c.caseId})} : @{/cases/new}">
+                <span class="step-num" aria-hidden="true">1</span> Case intake</a></li>
+        <li th:classappend="${step == 2} ? 'current'">
+            <a th:href="${c != null} ? @{/cases/{id}/investigation(id=${c.caseId})} : '#'" th:attr="aria-disabled=${c == null}">
+                <span class="step-num" aria-hidden="true">2</span> Investigation</a></li>
+        <li th:classappend="${step == 3} ? 'current'">
+            <a th:href="${c != null} ? @{/cases/{id}/recommendation(id=${c.caseId})} : '#'" th:attr="aria-disabled=${c == null}">
+                <span class="step-num" aria-hidden="true">3</span> Recommendation</a>
+            <ul class="substeps" th:if="${c != null}">
+                <li><a th:href="@{/cases/{id}/evidence(id=${c.caseId})}">Evidence</a></li>
+                <li><a th:href="@{/cases/{id}/citations(id=${c.caseId})}">Policy citations</a></li>
+            </ul></li>
+        <li th:classappend="${step == 4} ? 'current'">
+            <a th:href="${c != null} ? @{/cases/{id}/review(id=${c.caseId})} : '#'" th:attr="aria-disabled=${c == null}">
+                <span class="step-num" aria-hidden="true">4</span> Human review</a>
+            <ul class="substeps" th:if="${c != null}">
+                <li><a th:href="@{/cases/{id}/audit(id=${c.caseId})}">Audit trail</a></li>
+            </ul></li>
+    </ol>
+    <p class="mode-note">AI agent: <strong th:text="${'LangChain4j · ' + modelName}">LangChain4j</strong></p>
+</aside>
+
+<div th:fragment="flash">
+    <div class="alert alert-info" role="status" th:if="${info != null}" th:text="${info}">info</div>
+    <div class="alert alert-error" role="alert" th:if="${error != null}" th:text="${error}">error</div>
+</div>
+
+<footer th:fragment="footer" class="footer">
+    Advisory assistant for synthetic training cases. It may recommend a route, priority or evidence request; it never
+    blocks cards, refunds, moves funds, files reports or contacts customers. Final disposition rests with an authorised reviewer.
+</footer>
+</body>
+</html>
